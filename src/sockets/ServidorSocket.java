@@ -13,17 +13,14 @@ public class ServidorSocket extends Thread {
 
     private Socket conexao;
     private String nomeCliente;
-    private String nomeCareta;
-
-    private String pontuacao;
-
-    private String lampada;
 
     public ServidorSocket(Cliente c) {
         cliente = c;
     }
 
     public void run() {
+        System.out.println(clientes);
+
         try {
             BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getSocket().getInputStream()));
             PrintStream saida = new PrintStream(cliente.getSocket().getOutputStream());
@@ -34,25 +31,15 @@ public class ServidorSocket extends Thread {
             if (nomeCliente == null) {
                 return;
             }
-
             cliente.setNome(nomeCliente);
-
-            nomeCareta = entrada.readLine();
-
-            if (nomeCareta == null) {
-                return;
-            }
-
-            cliente.setCareta(nomeCareta);
             String texto = entrada.readLine();
             while (texto != null && !(texto.trim().equals(""))) {
                 sendToAll(saida, " disse: ", texto);
                 texto = entrada.readLine();
             }
-            sendToAll(saida, " saiu da conexao ", " JOGO ENCERRADO");
+            sendToAll(saida, " saiu da conexao ", " do chat");
             clientes.remove(saida);
             conexao.close();
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,7 +53,7 @@ public class ServidorSocket extends Thread {
                 Cliente outroCliente = iter.next();
                 PrintStream chat = (PrintStream) outroCliente.getSaida();
                 if (chat != saida) {
-                    chat.println(cliente.getNome() + texto1 + texto2);
+                    chat.println(cliente.getNome() + " com IP: " + cliente.getSocket().getRemoteSocketAddress() + texto1 + texto2);
                 }
             }
         } catch (Exception e) {
@@ -88,27 +75,28 @@ public class ServidorSocket extends Thread {
             e.printStackTrace();
         }
     }
-     public static void main(String[] args) {
+    public static void main(String[] args) {
         clientes = new ArrayList<Cliente>();
-         try {
+        try {
             ServerSocket s = new ServerSocket(2222);
 
-            System.out.println("ESPERANDO ALGUEM CONECTAR...");
             while (true) {
+                System.out.println("ESPERANDO ALGUEM CONECTAR...");
 
                 Socket conexao = s.accept();
-                
+
                 Cliente cliente = new Cliente();
-                
+
                 cliente.setId(conexao.getRemoteSocketAddress().toString());
+
                 cliente.setIp(conexao.getRemoteSocketAddress().toString());
-                
+
                 cliente.setSocket(conexao);
-                
+
                 clientes.add(cliente);
-                
-                System.out.println("CONECTOU "+ conexao.getRemoteSocketAddress());
-                
+
+                System.out.println("CONECTOU"+conexao.getRemoteSocketAddress());
+
                 Thread t = new ServidorSocket(cliente);
                 t.start();
 

@@ -1,10 +1,8 @@
-
+/*@author JorgeBueno*/
 package sockets;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClienteSocket extends Thread {
     private static boolean done = false;
@@ -12,7 +10,6 @@ public class ClienteSocket extends Thread {
 
     public ClienteSocket(Socket s) {
         conexao = s;
-
     }
 
     public void run() {
@@ -47,27 +44,16 @@ public class ClienteSocket extends Thread {
             String nome = teclado.readLine();
             saida.println(nome);
 
-            System.out.println("Digite o nome da sua Careta: ");
-
-            String careta = teclado.readLine();
-            saida.println(careta);
-
             Thread t = new ClienteSocket(conexao);//recebe do server
             t.start();
 
             String texto;
-
-//            System.out.println("Escolha uma Careta: ");
-
-            while (done == false) {
-                System.out.println("Digite o número da pergunta escolhida: ");
-
-                System.out.println("Array Perguntas ");
-//                for (int i = 1; i <= perguntas.size(); i++) {
-//                    System.out.println("[" + i + "]: " + perguntas.get(i));
-//                }
-
+            while (true) {
+                System.out.println("> ");
                 texto = teclado.readLine();
+                if (done) {
+                    break;
+                }
                 saida.println(texto);//envia ao server
 
             }
